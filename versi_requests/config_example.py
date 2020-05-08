@@ -1,0 +1,1 @@
+linkAPI='https://api.telegram.org/botxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/'
