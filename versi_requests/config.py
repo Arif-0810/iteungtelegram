@@ -1,1 +1,0 @@
-linkAPI='https://api.telegram.org/bot1034373665:AAFWI2v_RseeuKKpERAC6kOFK6nCVoFg1to/'
