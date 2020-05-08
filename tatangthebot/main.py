@@ -1,35 +1,49 @@
-import telebot
-from telebot import types
-
-bot = telebot.TeleBot("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-
-
-@bot.message_handler(commands=['start', 'help'])
-def send_welcome(message):
-    user = str(message.from_user.id)
-    bot.reply_to(message, "Howdy, how are you doing? You talk with user {} and his user ID: {} ".format(
-        user, user))
+from telegram.ext import Updater, InlineQueryHandler, CommandHandler, MessageHandler, Filters
+from telegram import KeyboardButton, ReplyKeyboardMarkup
+import requests
+import re
 
 
-@bot.message_handler(commands=['number'])
-def phone(message):
-    keyboard = types.ReplyKeyboardMarkup(
-        row_width=1, resize_keyboard=True)
-    button_phone = types.KeyboardButton(
-        text="Share Contact to Tatang", request_contact=True)
-    keyboard.add(button_phone)
-    bot.send_message(
-        message.chat.id, 'Would you mind sharing your contact with me?', reply_markup=keyboard)
+def start(update, context):
+    context.bot.send_message(
+        chat_id=update.effective_chat.id, text="Sebelum make saya kamu perlu konfigurasi dulu secara personal ke @tatangthebot dulu!")
 
 
-@bot.message_handler(content_types=['contact'])
-def contact(message):
-    bot.reply_to(message, "Ini nomor kamu ya {} dan id_user {}".format(
-        message.contact.phone_number, message.contact.user_id))
+def config(update, context):
+    type_chat = str(update.message.chat.type).lower()
+    if type_chat == "private":
+        yes = KeyboardButton(
+            text="Iya", request_contact=True)
+        no = KeyboardButton(
+            text="Tidak", request_contact=False)
+        keyboard = ReplyKeyboardMarkup([[yes, no]], resize_keyboard=True)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id, text='Yakin mau daftar nih?', reply_markup=keyboard)
+    else:
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text="Harus chat personal bosque kalo mau pake ini!")
 
 
-# @bot.message_handler(func=lambda message: True)
-# def echo_all(message):
-#     bot.reply_to(message, message.text)
+def phone(update, context):
+    number = update.message.contact.phone_number
+    user_id = update.message.contact.user_id
 
-bot.polling()
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="No HP : {}, ID User : {}".format(number, user_id))
+
+    print(update.message)
+
+
+def main():
+    updater = Updater(
+        'TOKEN', use_context=True)
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('config', config))
+    dp.add_handler(MessageHandler(Filters.contact, phone))
+    updater.start_polling()
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
