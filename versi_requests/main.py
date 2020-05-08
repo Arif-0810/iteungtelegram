@@ -1,8 +1,8 @@
 import requests
-from versi_requests import config
+from versi_requests import config_example
 
 def getLastUpdates():
-    req = requests.get(config.linkAPI + "getUpdates")
+    req = requests.get(config_example.linkAPI + "getUpdates")
     apidata = req.json()
     datalength=len(apidata['result'])
     lastdatalist=datalength-1
@@ -11,7 +11,7 @@ def getLastUpdates():
 
 def sendmessage(id, message):
     param={'chat_id':id, "text": message}
-    link= config.linkAPI + 'sendMessage'
+    link= config_example.linkAPI + 'sendMessage'
     resp=requests.post(link, data=param)
     return resp
 
